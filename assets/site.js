@@ -1,8 +1,7 @@
 (() => {
   const root = document.documentElement;
   const storedTheme = localStorage.getItem('jh-theme');
-  const preferredDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-  root.dataset.theme = storedTheme || (preferredDark ? 'dark' : 'light');
+  root.dataset.theme = storedTheme || 'light';
 
   document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
     button.addEventListener('click', () => {
