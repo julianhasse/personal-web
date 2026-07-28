@@ -47,25 +47,28 @@
       ['Client', project.client],
       ['Duration', project.duration || project.year],
       ['Status', project.status]
-    ].filter(([, value]) => value);
+    ].filter(([, value]) => displayText(value));
     const categories = project.categories.length ? project.categories : [project.type || 'Project'];
-    const coverStyle = [
-      project.accent ? `--project-accent:${escapeHtml(project.accent)}` : '',
-      project.text_color ? `--project-text:${escapeHtml(project.text_color)}` : ''
-    ].filter(Boolean).join(';');
+    const hero = displayText(project.cover);
+    const heroAlt = displayText(project.cover_alt) || project.title;
 
     return `
-      <header class="article-header work-header">
-        <p class="article-kicker">${escapeHtml(categories.join(' · '))}</p>
-        <h1>${escapeHtml(project.title)}</h1>
-        ${deck ? `<p class="article-deck">${escapeHtml(deck)}</p>` : ''}
-        ${facts.length ? `<dl class="project-facts">${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}</dl>` : ''}
-      </header>
-      <figure class="article-cover work-cover" style="${coverStyle}">
-        ${project.cover ? `<img src="${escapeHtml(project.cover)}" alt="${escapeHtml(project.cover_alt || '')}">` : `<span class="project-monogram">${escapeHtml(project.monogram || project.title.slice(0, 2).toUpperCase())}</span>`}
-      </figure>
-      <article class="article-body work-body">${marked.parse(project.body)}</article>
-      ${project.external_url ? `<p class="work-cta"><a class="text-link" href="${escapeHtml(project.external_url)}" target="_blank" rel="noreferrer">Visit project <span>↗</span></a></p>` : ''}`;
+      <div class="work-layout">
+        <aside class="work-sidebar">
+          <header class="article-header work-header">
+            <p class="article-kicker">${escapeHtml(categories.join(' · '))}</p>
+            <h1>${escapeHtml(project.title)}</h1>
+            ${deck ? `<p class="article-deck">${escapeHtml(deck)}</p>` : ''}
+          </header>
+          ${facts.length ? `<dl class="project-facts">${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(displayText(value))}</dd></div>`).join('')}</dl>` : ''}
+        </aside>
+
+        <main class="work-main">
+          ${hero ? `<figure class="article-cover work-cover"><img src="${escapeHtml(hero)}" alt="${escapeHtml(heroAlt)}"></figure>` : ''}
+          <article class="article-body work-body">${marked.parse(project.body)}</article>
+          ${project.external_url ? `<p class="work-cta"><a class="text-link" href="${escapeHtml(project.external_url)}" target="_blank" rel="noreferrer">Visit project <span>↗</span></a></p>` : ''}
+        </main>
+      </div>`;
   }
 
   try {
