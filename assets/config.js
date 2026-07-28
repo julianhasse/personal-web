@@ -7,7 +7,9 @@ window.JH_SITE_CONFIG = {
     owner: 'julianhasse',
     repo: 'personal-web',
     branch: 'main',
-    contentPath: 'content'
-  },
-  articlesPerPage: 50
-};
+    contentPaths: {
+      writing: 'content/writing',
+      work: 'content/work'
+    },
+    articlesPerPage: 25
+  };
