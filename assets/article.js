@@ -18,7 +18,7 @@
     const navLink = document.querySelector('.article-nav a');
     if (!navLink) return;
     navLink.href = contentType === 'work' ? 'index.html#work' : 'index.html#writing';
-    navLink.textContent = contentType === 'work' ? 'All work' : 'All writing';
+    navLink.textContent = contentType === 'work' ? 'All projects' : 'All writing';
   }
 
   function renderWriting(article) {
@@ -40,7 +40,7 @@
       ['Duration', project.duration || project.year],
       ['Status', project.status]
     ].filter(([, value]) => value);
-    const categories = project.categories.length ? project.categories : [project.type || 'Selected work'];
+    const categories = project.categories.length ? project.categories : [project.type || 'Project'];
     const coverStyle = [
       project.accent ? `--project-accent:${escapeHtml(project.accent)}` : '',
       project.text_color ? `--project-text:${escapeHtml(project.text_color)}` : ''
@@ -70,6 +70,6 @@
     target.innerHTML = type === 'work' ? renderWork(content) : renderWriting(content);
   } catch (error) {
     const label = type === 'work' ? 'Project' : 'Article';
-    target.innerHTML = `<div class="article-loading"><h1>${label} unavailable</h1><p>${escapeHtml(error.message)}</p><p><a href="index.html#${type === 'work' ? 'work' : 'writing'}">Return to ${type === 'work' ? 'work' : 'writing'}</a></p></div>`;
+    target.innerHTML = `<div class="article-loading"><h1>${label} unavailable</h1><p>${escapeHtml(error.message)}</p><p><a href="index.html#${type === 'work' ? 'work' : 'writing'}">Return to ${type === 'work' ? 'projects' : 'writing'}</a></p></div>`;
   }
 })();

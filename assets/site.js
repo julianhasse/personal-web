@@ -73,7 +73,7 @@
         </article>`).join('');
       rebuildSearch();
     } catch (error) {
-      grid.innerHTML = `<div class="content-error"><strong>Selected work could not load.</strong><p>${escapeHtml(error.message)}</p></div>`;
+      grid.innerHTML = `<div class="content-error"><strong>Projects could not load.</strong><p>${escapeHtml(error.message)}</p></div>`;
     }
   }
 
@@ -157,7 +157,7 @@
   const commands = {
     help: 'Commands: about, work, writing, music, random, clear, close',
     about: 'Julian is a designer, developer, writer, and musician based in North Carolina.',
-    work: 'Opening selected work…',
+    work: 'Opening projects…',
     writing: 'Opening writing archive…',
     music: 'Neon Transit — composition, production, and art direction.'
   };

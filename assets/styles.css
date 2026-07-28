@@ -283,3 +283,33 @@ button { color: inherit; }
 .work-body { max-width: 840px; }
 .work-cta { margin: 3rem auto; max-width: 840px; }
 @media (max-width: 720px) { .project-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Project case-study typography */
+.work-header h1 {
+  max-width: 12ch;
+  font-size: clamp(3.25rem, 7vw, 6.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.work-header .article-kicker {
+  margin-bottom: 1.25rem;
+}
+
+.work-header .article-deck {
+  margin-top: 1.5rem;
+}
+
+.footer-brand span {
+  color: inherit;
+  font-style: normal;
+}
+
+@media (max-width: 800px) {
+  .work-header h1 {
+    max-width: none;
+    font-size: clamp(3rem, 15vw, 5rem);
+    line-height: 1.04;
+  }
+}
