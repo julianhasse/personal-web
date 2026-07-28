@@ -10,6 +10,8 @@ window.JH_SITE_CONFIG = {
     contentPaths: {
       writing: 'content/writing',
       work: 'content/work'
-    },
-    articlesPerPage: 25
-  };
+    }
+  },
+  articlesPerPage: 25,
+  projectsPerPage: 12
+};
