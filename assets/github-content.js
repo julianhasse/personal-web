@@ -43,6 +43,9 @@
 
   function parseValue(value) {
     const clean = unquote(value);
+    // Spreadsheet/CSV exports sometimes serialize missing values as "nan".
+    // Treat those placeholders as empty so they are never displayed on the site.
+    if (/^(?:nan|null|none|undefined)$/i.test(clean)) return '';
     if (clean === 'true') return true;
     if (clean === 'false') return false;
     if (/^-?\d+(\.\d+)?$/.test(clean)) return Number(clean);
@@ -101,13 +104,22 @@
       .trim();
     const wordCount = plain ? plain.split(/\s+/).length : 0;
 
+    const validText = (value) => {
+      if (value === null || value === undefined) return '';
+      const text = String(value).trim();
+      return /^(?:nan|null|none|undefined)$/i.test(text) ? '' : text;
+    };
+    const generatedExcerpt = `${plain.slice(0, 180)}${plain.length > 180 ? '…' : ''}`;
+    const description = validText(data.description) || validText(data.summary) || validText(data.excerpt) || generatedExcerpt;
+    const summary = validText(data.summary) || validText(data.description) || validText(data.excerpt) || generatedExcerpt;
+
     return {
       ...data,
       contentType: type,
       slug: data.slug || fallbackSlug,
-      title: data.title || firstHeading || fallbackSlug.replace(/-/g, ' '),
-      description: data.description || data.summary || data.excerpt || `${plain.slice(0, 180)}${plain.length > 180 ? '…' : ''}`,
-      summary: data.summary || data.description || data.excerpt || `${plain.slice(0, 180)}${plain.length > 180 ? '…' : ''}`,
+      title: validText(data.title) || firstHeading || fallbackSlug.replace(/-/g, ' '),
+      description,
+      summary,
       tags: normalizeList(data.tags),
       categories: normalizeList(data.categories),
       reading: data.reading || `${Math.max(1, Math.ceil(wordCount / 220))} min read`,

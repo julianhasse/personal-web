@@ -21,12 +21,19 @@
     navLink.textContent = contentType === 'work' ? 'All projects' : 'All writing';
   }
 
+  const displayText = (value) => {
+    if (value === null || value === undefined) return '';
+    const text = String(value).trim();
+    return /^(?:nan|null|none|undefined)$/i.test(text) ? '' : text;
+  };
+
   function renderWriting(article) {
+    const deck = displayText(article.description);
     return `
       <header class="article-header">
         <p class="article-kicker">${escapeHtml(article.tags.join(' · ') || 'Writing')}</p>
         <h1>${escapeHtml(article.title)}</h1>
-        <p class="article-deck">${escapeHtml(article.description || '')}</p>
+        ${deck ? `<p class="article-deck">${escapeHtml(deck)}</p>` : ''}
         <div class="article-byline"><span>${escapeHtml(article.author || 'Julian Hasse')}</span><time datetime="${escapeHtml(article.date || '')}">${escapeHtml(formatDate(article.date))}</time><span>${escapeHtml(article.reading)}</span></div>
       </header>
       ${article.cover ? `<figure class="article-cover"><img src="${escapeHtml(article.cover)}" alt="${escapeHtml(article.cover_alt || '')}"></figure>` : ''}
@@ -34,6 +41,7 @@
   }
 
   function renderWork(project) {
+    const deck = displayText(project.summary) || displayText(project.description);
     const facts = [
       ['Role', project.role],
       ['Client', project.client],
@@ -50,7 +58,7 @@
       <header class="article-header work-header">
         <p class="article-kicker">${escapeHtml(categories.join(' · '))}</p>
         <h1>${escapeHtml(project.title)}</h1>
-        <p class="article-deck">${escapeHtml(project.summary || project.description || '')}</p>
+        ${deck ? `<p class="article-deck">${escapeHtml(deck)}</p>` : ''}
         ${facts.length ? `<dl class="project-facts">${facts.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}</dl>` : ''}
       </header>
       <figure class="article-cover work-cover" style="${coverStyle}">
