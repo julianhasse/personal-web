@@ -1,24 +1,18 @@
 ---
-title: "The AI Canvas"
-slug: "the-ai-canvas"
-type: "Media"
-status: "Ongoing"
-year: "2026"
-featured: true
-order: 2
-categories:
-  - AI
-  - Design
-  - Podcast
-summary: "An independent publication and podcast exploring how artificial intelligence is reshaping design and creative practice."
-role: "Creator, Host, and Designer"
-client: "Independent"
-duration: "2026–Present"
-accent: "#1f36ff"
-text_color: "#ffffff"
-monogram: "AI"
-external_url: ""
+title: The AI Canvas
+
+category: AI · Design · Podcast
+
+role: Creator, Host, and Designer
+client: Independent
+duration: 2026–Present
+status: Ongoing
+
+description: An independent publication and podcast exploring how artificial intelligence is reshaping design and creative practice.
+
+cover: /assets/projects/ai-canvas/hero.jpg
 ---
+
 
 # The AI Canvas
 
