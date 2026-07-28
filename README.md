@@ -1,10 +1,20 @@
-# Julian Hasse | Creator — GitHub Markdown Edition
+# Julian Hasse | Design Technologist — GitHub Markdown Edition
 
-This version uses GitHub as a lightweight, read-only content API. There is no CMS, PHP, Node build, database, or manually maintained article array.
+This site uses GitHub as a lightweight, read-only content source. Writing and portfolio projects are stored as separate content types, with no CMS, PHP, Node build, database, or manually maintained article/project arrays.
+
+## Content structure
+
+```text
+content/
+├── writing/    Essays and articles
+└── work/       Portfolio projects and case studies
+```
+
+The separation allows each type to use its own frontmatter and rendering while preserving one Markdown-based publishing workflow.
 
 ## One-time setup
 
-Open `assets/config.js` and enter:
+Open `assets/config.js` and enter your public repository details:
 
 ```js
 window.JH_SITE_CONFIG = {
@@ -12,25 +22,49 @@ window.JH_SITE_CONFIG = {
     owner: 'julianhasse',
     repo: 'your-repository-name',
     branch: 'main',
-    contentPath: 'content'
+    contentPaths: {
+      writing: 'content/writing',
+      work: 'content/work'
+    }
   },
-  articlesPerPage: 50
+  articlesPerPage: 50,
+  projectsPerPage: 12
 };
 ```
 
-The repository must be public. Never place a GitHub personal access token in browser JavaScript.
+Never place a GitHub personal access token in browser JavaScript.
 
-## Publish an article
+## Publish writing
 
-1. Add a `.md` file to `/content` in the configured GitHub repository.
-2. Commit it through GitHub.com, GitHub Desktop, or Git.
+1. Add a `.md` file to `/content/writing`.
+2. Commit and push it to GitHub.
 3. Refresh the website.
 
-The homepage and search discover the file automatically.
+Article URLs remain:
 
-## Markdown format
+```text
+article.html?post=article-slug
+```
 
-```md
+## Publish selected work
+
+1. Copy `/content/work/_work-template.md`.
+2. Rename it using the project slug, such as `new-project.md`.
+3. Set `draft: false` or remove the `draft` field.
+4. Set `featured: true` for homepage visibility.
+5. Commit and push.
+
+Project URLs use:
+
+```text
+article.html?type=work&post=project-slug
+```
+
+The homepage and search discover both writing and work automatically.
+
+## Writing frontmatter
+
+```yaml
 ---
 title: "Git for Designers"
 date: "2026-07-27"
@@ -42,38 +76,32 @@ cover: "assets/images/git-for-designers/cover.jpg"
 author: "Julian Hasse"
 featured: true
 ---
-
-# Git for Designers
-
-Your article begins here.
 ```
 
-Only `title` and `date` are recommended. Missing description and reading time are generated automatically. The filename becomes the article slug unless `slug` is supplied.
+The filename becomes the slug unless `slug` is supplied. Missing descriptions and reading times are generated automatically.
+
+## Selected Work frontmatter
+
+See `SELECTED-WORK-FRONTMATTER.md` for the full reference. A copy-ready draft template lives at `/content/work/_work-template.md`.
 
 ## Images
 
-Commit images to the repository and reference them with a URL the deployed website can reach. For a site hosted from the repository root:
+Commit images to the repository and reference them with a site-accessible path:
 
 ```md
 ![Diagram](assets/images/git-for-designers/diagram.jpg)
 ```
 
-A remote image URL also works:
+Remote image URLs also work.
 
-```md
-![Diagram](https://example.com/image.jpg)
-```
+## Limitations
 
-## Important limitations
-
-- GitHub's unauthenticated REST API has a rate limit. This implementation loads the directory once and fetches each Markdown file for the homepage. It is ideal for a modest personal publication, not a high-traffic news site.
-- Because credentials cannot safely live in client-side JavaScript, the repository must be public.
-- GitHub Pages may take a short time to publish a commit. Raw GitHub content can also be briefly cached.
-- The GitHub Contents API returns up to 1,000 files in a directory. That is far above the expected size of this site.
+- The repository must be public because credentials cannot safely live in client-side JavaScript.
+- GitHub's unauthenticated REST API is rate-limited.
+- The Contents API returns up to 1,000 files in a directory.
+- This approach is well suited to a personal publication and portfolio, not a high-traffic news site.
 
 ## Local testing
-
-Because the site calls GitHub directly, any simple local server works:
 
 ```bash
 python3 -m http.server 8080
@@ -83,4 +111,4 @@ Then open `http://localhost:8080`.
 
 ## Hosting
 
-Upload the static files to your current host or serve them through GitHub Pages. The content may live in the same public repository or a separate public content repository.
+Upload the static frontend files to your existing IONOS hosting. The Markdown content is read from the configured GitHub repository.

@@ -1,28 +1,33 @@
 (() => {
-  const config = window.JH_SITE_CONFIG?.github || {};
-  const required = ['owner', 'repo', 'branch', 'contentPath'];
+  const github = window.JH_SITE_CONFIG?.github || {};
+  const required = ['owner', 'repo', 'branch'];
 
   function configured() {
-    return required.every((key) => config[key] && !String(config[key]).startsWith('YOUR_'));
+    return required.every((key) => github[key] && !String(github[key]).startsWith('YOUR_'));
+  }
+
+  function contentPath(type = 'writing') {
+    const paths = github.contentPaths || {};
+    return paths[type] || (type === 'writing' ? github.contentPath : '') || `content/${type}`;
   }
 
   function apiUrl(path = '') {
     const encodedPath = path.split('/').filter(Boolean).map(encodeURIComponent).join('/');
-    return `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents/${encodedPath}?ref=${encodeURIComponent(config.branch)}`;
+    return `https://api.github.com/repos/${encodeURIComponent(github.owner)}/${encodeURIComponent(github.repo)}/contents/${encodedPath}?ref=${encodeURIComponent(github.branch)}`;
   }
 
   function rawUrl(path) {
-    return `https://raw.githubusercontent.com/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/${encodeURIComponent(config.branch)}/${path.split('/').map(encodeURIComponent).join('/')}`;
+    return `https://raw.githubusercontent.com/${encodeURIComponent(github.owner)}/${encodeURIComponent(github.repo)}/${encodeURIComponent(github.branch)}/${path.split('/').map(encodeURIComponent).join('/')}`;
   }
 
   async function request(url) {
-    const response = await fetch(url, {
-      headers: { Accept: 'application/vnd.github+json' }
-    });
+    const response = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
     if (!response.ok) {
       const message = response.status === 403
         ? 'GitHub API rate limit reached. Try again later.'
-        : `GitHub request failed (${response.status}).`;
+        : response.status === 404
+          ? 'Content file or folder not found.'
+          : `GitHub request failed (${response.status}).`;
       throw new Error(message);
     }
     return response;
@@ -47,7 +52,15 @@
     return clean;
   }
 
-  function parseMarkdown(markdown, fallbackSlug = '') {
+  function normalizeList(value) {
+    if (Array.isArray(value)) return value.map(String).map((item) => item.trim()).filter(Boolean);
+    return String(value || '')
+      .split(/\s*(?:,|·|\|)\s*/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  function parseMarkdown(markdown, fallbackSlug = '', type = 'writing') {
     const normalized = markdown.replace(/^\uFEFF/, '');
     const lines = normalized.split(/\r?\n/);
     const data = {};
@@ -87,49 +100,72 @@
       .replace(/\s+/g, ' ')
       .trim();
     const wordCount = plain ? plain.split(/\s+/).length : 0;
-    const tags = Array.isArray(data.tags)
-      ? data.tags
-      : String(data.tags || '').split(',').map((tag) => tag.trim()).filter(Boolean);
 
     return {
       ...data,
+      contentType: type,
       slug: data.slug || fallbackSlug,
       title: data.title || firstHeading || fallbackSlug.replace(/-/g, ' '),
-      description: data.description || data.excerpt || `${plain.slice(0, 180)}${plain.length > 180 ? '…' : ''}`,
-      tags,
+      description: data.description || data.summary || data.excerpt || `${plain.slice(0, 180)}${plain.length > 180 ? '…' : ''}`,
+      summary: data.summary || data.description || data.excerpt || `${plain.slice(0, 180)}${plain.length > 180 ? '…' : ''}`,
+      tags: normalizeList(data.tags),
+      categories: normalizeList(data.categories),
       reading: data.reading || `${Math.max(1, Math.ceil(wordCount / 220))} min read`,
       body
     };
   }
 
-  async function listArticles() {
+  async function listContent(type = 'writing') {
     if (!configured()) throw new Error('GitHub repository is not configured yet. Edit assets/config.js once.');
-    const response = await request(apiUrl(config.contentPath));
+    const folder = contentPath(type);
+    const response = await request(apiUrl(folder));
     const entries = await response.json();
-    if (!Array.isArray(entries)) throw new Error('The configured content path is not a directory.');
+    if (!Array.isArray(entries)) throw new Error(`The configured ${type} path is not a directory.`);
 
     const files = entries.filter((entry) => entry.type === 'file' && entry.name.toLowerCase().endsWith('.md'));
-    const articles = await Promise.all(files.map(async (file) => {
+    const items = await Promise.all(files.map(async (file) => {
       const slug = file.name.replace(/\.md$/i, '');
       const markdownResponse = await request(file.download_url || rawUrl(file.path));
       const markdown = await markdownResponse.text();
-      return { ...parseMarkdown(markdown, slug), path: file.path, sha: file.sha };
+      return { ...parseMarkdown(markdown, slug, type), path: file.path, sha: file.sha };
     }));
 
-    return articles
-      .filter((article) => article.draft !== true && article.status !== 'draft')
-      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    return items.filter((item) => item.draft !== true && item.status !== 'draft');
   }
 
-  async function getArticle(slug) {
+  async function listArticles() {
+    const articles = await listContent('writing');
+    return articles.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  }
+
+  async function listProjects() {
+    const projects = await listContent('work');
+    return projects
+      .filter((project) => project.featured !== false)
+      .sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
+  }
+
+  async function getContent(type = 'writing', slug = '') {
     if (!configured()) throw new Error('GitHub repository is not configured yet. Edit assets/config.js once.');
+    const safeType = ['writing', 'work', 'music', 'talks'].includes(type) ? type : 'writing';
     const safeSlug = String(slug || '').replace(/[^a-z0-9-_]/gi, '');
-    if (!safeSlug) throw new Error('Invalid article name.');
-    const path = `${config.contentPath.replace(/\/$/, '')}/${safeSlug}.md`;
+    if (!safeSlug) throw new Error('Invalid content name.');
+    const path = `${contentPath(safeType).replace(/\/$/, '')}/${safeSlug}.md`;
     const response = await request(rawUrl(path));
-    const markdown = await response.text();
-    return parseMarkdown(markdown, safeSlug);
+    return parseMarkdown(await response.text(), safeSlug, safeType);
   }
 
-  window.JH_CONTENT = { configured, listArticles, getArticle, parseMarkdown, rawUrl };
+  const getArticle = (slug) => getContent('writing', slug);
+
+  window.JH_CONTENT = {
+    configured,
+    listContent,
+    listArticles,
+    listProjects,
+    getContent,
+    getArticle,
+    parseMarkdown,
+    rawUrl,
+    contentPath
+  };
 })();

@@ -18,12 +18,9 @@
     nav?.classList.toggle('is-open', !open);
   });
 
-  const projectSearchItems = [
-    { title: 'The AI Canvas', type: 'Project · Media', tags: 'podcast ai design', href: '#project-canvas' },
-    { title: 'Diagnostic Assistant', type: 'Project · Healthcare', tags: 'healthcare product design ai', href: '#project-health' },
-    { title: 'Neon Transit', type: 'Project · Music', tags: 'music album composition', href: '#project-music' }
-  ];
-  let searchable = [...projectSearchItems];
+  let searchable = [];
+  let loadedArticles = [];
+  let loadedProjects = [];
 
   const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -36,11 +33,73 @@
     return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
   }
 
+
+  function projectHref(project) {
+    return project.external_url || `article.html?type=work&post=${encodeURIComponent(project.slug)}`;
+  }
+
+  function projectVisual(project) {
+    const style = [
+      project.accent ? `--project-accent:${escapeHtml(project.accent)}` : '',
+      project.text_color ? `--project-text:${escapeHtml(project.text_color)}` : ''
+    ].filter(Boolean).join(';');
+    const image = project.cover
+      ? `<img src="${escapeHtml(project.cover)}" alt="${escapeHtml(project.cover_alt || '')}">`
+      : `<span class="project-monogram">${escapeHtml(project.monogram || project.title.slice(0, 2).toUpperCase())}</span>`;
+    return `<a class="project-visual project-visual--dynamic" style="${style}" href="${escapeHtml(projectHref(project))}" aria-label="Open ${escapeHtml(project.title)} project">
+      <div class="project-badges"><span>${escapeHtml(project.type || 'Project')}</span><span>${escapeHtml(project.status || project.year || '')}</span></div>
+      ${image}
+    </a>`;
+  }
+
+  async function loadWork() {
+    const grid = document.querySelector('#project-grid');
+    if (!grid || !window.JH_CONTENT) return;
+    try {
+      const projects = await window.JH_CONTENT.listProjects();
+      loadedProjects = projects;
+      if (!projects.length) {
+        grid.innerHTML = '<p class="content-status">No featured work projects found.</p>';
+        return;
+      }
+      const limit = window.JH_SITE_CONFIG?.projectsPerPage || projects.length;
+      grid.innerHTML = projects.slice(0, limit).map((project) => `
+        <article class="project-card" data-filter="${escapeHtml([project.type, ...project.categories].join(' '))}">
+          ${projectVisual(project)}
+          <div class="project-meta">
+            <h3><a href="${escapeHtml(projectHref(project))}">${escapeHtml(project.title)}</a></h3>
+            <p>${escapeHtml((project.categories.length ? project.categories : [project.role || project.summary]).join(' ✳ '))}</p>
+          </div>
+        </article>`).join('');
+      rebuildSearch();
+    } catch (error) {
+      grid.innerHTML = `<div class="content-error"><strong>Selected work could not load.</strong><p>${escapeHtml(error.message)}</p></div>`;
+    }
+  }
+
+  function rebuildSearch() {
+    searchable = [
+      ...loadedArticles.map((article) => ({
+        title: article.title,
+        type: `Writing${article.tags[0] ? ` · ${article.tags[0]}` : ''}`,
+        tags: article.tags.join(' '),
+        href: `article.html?post=${encodeURIComponent(article.slug)}`
+      })),
+      ...loadedProjects.map((project) => ({
+        title: project.title,
+        type: `Work${project.type ? ` · ${project.type}` : ''}`,
+        tags: project.categories.join(' '),
+        href: projectHref(project)
+      }))
+    ];
+  }
+
   async function loadWriting() {
     const list = document.querySelector('#article-list');
     if (!list || !window.JH_CONTENT) return;
     try {
       const articles = await window.JH_CONTENT.listArticles();
+      loadedArticles = articles;
       if (!articles.length) {
         list.innerHTML = '<p class="content-status">No published Markdown articles found.</p>';
         return;
@@ -55,15 +114,7 @@
             <span class="article-arrow">↗</span>
           </a>
         </article>`).join('');
-      searchable = [
-        ...articles.map((article) => ({
-          title: article.title,
-          type: `Writing${article.tags[0] ? ` · ${article.tags[0]}` : ''}`,
-          tags: article.tags.join(' '),
-          href: `article.html?post=${encodeURIComponent(article.slug)}`
-        })),
-        ...projectSearchItems
-      ];
+      rebuildSearch();
     } catch (error) {
       list.innerHTML = `<div class="content-error"><strong>Writing could not load.</strong><p>${escapeHtml(error.message)}</p></div>`;
     }
@@ -135,4 +186,5 @@
   });
 
   loadWriting();
+  loadWork();
 })();
