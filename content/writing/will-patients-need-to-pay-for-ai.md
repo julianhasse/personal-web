@@ -2,7 +2,7 @@
 title: "Will Patients need to pay for AI in their healthcare journey?"
 date: May 29, 2026
 tags: Healthcare · AI · Design · Technology
-description: "nan"
+description: "Charging patients extra for AI-assisted care risks turning better diagnostics into a premium feature and widening inequities in healthcare."
 reading: 4 min read
 ---
 

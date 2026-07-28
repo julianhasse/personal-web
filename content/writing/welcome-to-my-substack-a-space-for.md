@@ -2,7 +2,7 @@
 title: "Welcome to My Substack – A Space for Curiosity and Creation"
 date: February 26, 2025
 tags: AI · Design · Publishing
-description: "nan"
+description: "A personal publishing space for ideas about design, storytelling, artificial intelligence, art, and the unexpected intersections between them."
 reading: 1 min read
 ---
 

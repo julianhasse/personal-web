@@ -2,7 +2,7 @@
 title: "The Designer as Editor: Safeguarding Expertise in the Age of Vibe-Design"
 date: April 16, 2026
 tags: AI · Design · Technology · Research
-description: "nan"
+description: "As AI accelerates design production, the designer’s value shifts from making more options to editing, constraining, and protecting coherent systems."
 reading: 4 min read
 ---
 

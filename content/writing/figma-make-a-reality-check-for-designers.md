@@ -2,7 +2,7 @@
 title: "Figma Make: A Reality Check for Designers"
 date: November 21, 2025
 tags: AI · Design · Technology · Vibe Coding
-description: "nan"
+description: "A hands-on look at Figma Make, its promise for AI-assisted product creation, and the limits that still require human craft and judgment."
 reading: 5 min read
 ---
 

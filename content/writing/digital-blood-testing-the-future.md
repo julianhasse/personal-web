@@ -2,7 +2,7 @@
 title: "Digital Blood Testing: The Future of Diagnostics Without the Needle"
 date: June 1, 2026
 tags: Healthcare · AI · Design · Technology
-description: "nan"
+description: "Digital blood testing could transform diagnostics through sensors, wearables, liquid biopsy, continuous monitoring, and AI-driven analysis."
 reading: 6 min read
 ---
 
