@@ -11,6 +11,7 @@ status: Ongoing
 description: An independent publication and podcast exploring how artificial intelligence is reshaping design and creative practice.
 
 cover: /assets/projects/ai-canvas/hero.png
+cover_alt: The AI Canvas publication and podcast
 ---
 
 
