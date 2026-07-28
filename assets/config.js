@@ -4,8 +4,8 @@
  */
 window.JH_SITE_CONFIG = {
   github: {
-    owner: 'YOUR_GITHUB_USERNAME',
-    repo: 'YOUR_REPOSITORY_NAME',
+    owner: 'julianhasse',
+    repo: 'personal-web',
     branch: 'main',
     contentPath: 'content'
   },
