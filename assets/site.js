@@ -38,19 +38,23 @@
     return project.external_url || `article.html?type=work&post=${encodeURIComponent(project.slug)}`;
   }
 
-  function projectVisual(project) {
-    const style = [
-      project.accent ? `--project-accent:${escapeHtml(project.accent)}` : '',
-      project.text_color ? `--project-text:${escapeHtml(project.text_color)}` : ''
-    ].filter(Boolean).join(';');
-    const image = project.cover
-      ? `<img src="${escapeHtml(project.cover)}" alt="${escapeHtml(project.cover_alt || '')}">`
-      : `<span class="project-monogram">${escapeHtml(project.monogram || project.title.slice(0, 2).toUpperCase())}</span>`;
-    return `<a class="project-visual project-visual--dynamic" style="${style}" href="${escapeHtml(projectHref(project))}" aria-label="Open ${escapeHtml(project.title)} project">
-      <div class="project-badges"><span>${escapeHtml(project.type || 'Project')}</span><span>${escapeHtml(project.status || project.year || '')}</span></div>
-      ${image}
-    </a>`;
+  function projectAccent(project) {
+    if (project.card_accent) return project.card_accent;
+    const terms = [project.type, ...(project.categories || [])].join(' ').toLowerCase();
+    if (terms.includes('health')) return '#7d93ad';
+    if (terms.includes('music') || terms.includes('album')) return '#ad906f';
+    if (terms.includes('ai') || terms.includes('technology')) return '#8b82a8';
+    if (terms.includes('writing') || terms.includes('publication')) return '#858581';
+    return '#8d9690';
   }
+
+  function projectCategories(project) {
+    const values = [project.type, ...(project.categories || [])]
+      .map((value) => String(value || '').trim())
+      .filter(Boolean);
+    return [...new Set(values.map((value) => value.toUpperCase()))].join(' · ');
+  }
+
 
   async function loadWork() {
     const grid = document.querySelector('#project-grid');
@@ -63,14 +67,24 @@
         return;
       }
       const limit = window.JH_SITE_CONFIG?.projectsPerPage || projects.length;
-      grid.innerHTML = projects.slice(0, limit).map((project) => `
-        <article class="project-card" data-filter="${escapeHtml([project.type, ...project.categories].join(' '))}">
-          ${projectVisual(project)}
-          <div class="project-meta">
-            <h3><a href="${escapeHtml(projectHref(project))}">${escapeHtml(project.title)}</a></h3>
-            <p>${escapeHtml((project.categories.length ? project.categories : [project.role || project.summary]).join(' ✳ '))}</p>
-          </div>
-        </article>`).join('');
+      grid.innerHTML = projects.slice(0, limit).map((project) => {
+        const href = projectHref(project);
+        const summary = project.card_summary || project.summary || project.description || '';
+        const footerLabel = project.year || project.status || 'View project';
+        return `
+        <article class="project-card" data-filter="${escapeHtml([project.type, ...(project.categories || [])].join(' '))}" style="--project-accent:${escapeHtml(projectAccent(project))}">
+          <a class="project-card-link" href="${escapeHtml(href)}" aria-label="Open ${escapeHtml(project.title)} project">
+            <p class="project-categories">${escapeHtml(projectCategories(project))}</p>
+            <div class="project-rule" aria-hidden="true"></div>
+            <h3>${escapeHtml(project.title)}</h3>
+            ${summary ? `<p class="project-summary">${escapeHtml(summary)}</p>` : ''}
+            <div class="project-footer">
+              <span>${escapeHtml(footerLabel)}</span>
+              <span class="project-arrow" aria-hidden="true">→</span>
+            </div>
+          </a>
+        </article>`;
+      }).join('');
       rebuildSearch();
     } catch (error) {
       grid.innerHTML = `<div class="content-error"><strong>Projects could not load.</strong><p>${escapeHtml(error.message)}</p></div>`;

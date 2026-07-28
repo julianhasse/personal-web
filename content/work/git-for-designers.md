@@ -14,10 +14,10 @@ summary: "An in-depth, designer-friendly introduction to Git, version control, b
 role: "Author and Designer"
 client: "Independent"
 duration: "2026"
-accent: "#d7ff3f"
+accent: "#ffe53f"
 text_color: "#0a0a08"
 monogram: "GIT"
-external_url: ""
+external_url: "https://www.linkedin.com/in/julianhasse/"
 ---
 
 # Git for Designers
