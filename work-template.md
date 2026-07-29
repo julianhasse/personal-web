@@ -1,4 +1,4 @@
-# Selected Work template
+# Projects template
 
 The active copy-ready template now lives at:
 

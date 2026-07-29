@@ -1,4 +1,4 @@
-# Selected Work frontmatter guide
+# Projects frontmatter guide
 
 Use one Markdown file per project. Store each published project in `content/work/`. The homepage and search load that directory automatically.
 

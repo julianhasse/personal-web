@@ -46,7 +46,7 @@ Article URLs remain:
 article.html?post=article-slug
 ```
 
-## Publish selected work
+## Publish projects
 
 1. Copy `/content/work/_work-template.md`.
 2. Rename it using the project slug, such as `new-project.md`.
@@ -80,7 +80,7 @@ featured: true
 
 The filename becomes the slug unless `slug` is supplied. Missing descriptions and reading times are generated automatically.
 
-## Selected Work frontmatter
+## Projects frontmatter
 
 See `SELECTED-WORK-FRONTMATTER.md` for the full reference. A copy-ready draft template lives at `/content/work/_work-template.md`.
 
