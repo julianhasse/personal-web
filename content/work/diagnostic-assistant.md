@@ -1,23 +1,10 @@
 ---
-title: "Diagnostic Assistant"
-slug: "diagnostic-assistant"
-type: "Product"
-status: "Healthcare"
-year: "2026"
-featured: true
-order: 3
-categories:
-  - Product Design
-  - Healthcare
-  - AI
-summary: "A provider-facing experience that makes laboratory test discovery, ordering, and tracking easier inside clinical workflows."
-role: "Senior UX Designer"
-client: "Labcorp"
-duration: "2024–Present"
-accent: "#ffd4d8"
-text_color: "#5b1534"
-monogram: "DA"
-external_url: ""
+title: Diagnostic Assistant
+summary: A provider-facing experience that makes laboratory test discovery, ordering, and tracking easier inside clinical workflows.
+role: Senior UX Designer
+client: Labcorp
+duration: 2024–Present
+status: Healthcare
 ---
 
 # Diagnostic Assistant
