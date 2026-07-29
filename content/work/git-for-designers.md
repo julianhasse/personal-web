@@ -1,22 +1,21 @@
 ---
 title: "Git for Designers"
-date: "2026-07-29"
 description: "An in-depth, designer-friendly introduction to Git, version control, branches, and collaborative workflows."
-reading: "1 min read"
+date: "2026-07-29T17:00:00-04:00"
 author: "Julian Hasse"
 draft: false
 featured: true
-summary: "An in-depth, designer-friendly introduction to Git, version control, branches, and collaborative workflows."
+slug: "git-for-designers"
+
 role: "Author and Designer"
 client: "Independent"
-duration: "2026"
 year: "2026"
 status: "Published"
-external_url: "https://www.linkedin.com/in/julianhasse/"
-slug: "git-for-designers"
-type: "Publication"
-order: "1"
-accent: "#ffe53f"
+external_url: ""
+project_type: "Publication"
+order: 1
+
+accent: "#dec732"
 text_color: "#0a0a08"
 monogram: "GIT"
 ---
