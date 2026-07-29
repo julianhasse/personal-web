@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Editorial OS | Julian Hasse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/editor.css?v=1">
+</head>
+<body>
+  <div class="editor-shell">
+    <header class="editor-topbar">
+      <div>
+        <a class="editor-brand" href="index.html">Julian Hasse <span>✳</span></a>
+        <span class="editor-product">Editorial OS</span>
+      </div>
+      <div class="editor-top-actions">
+        <span id="save-status" class="save-status" aria-live="polite">Not connected</span>
+        <button id="connect-button" class="button button-secondary" type="button">Connect GitHub</button>
+        <button id="save-draft-button" class="button button-secondary" type="button" disabled>Save draft</button>
+        <button id="publish-button" class="button button-primary" type="button" disabled>Publish</button>
+      </div>
+    </header>
+
+    <aside class="editor-sidebar">
+      <div class="sidebar-heading">
+        <div class="content-tabs" role="tablist" aria-label="Content type">
+          <button class="content-tab is-active" type="button" data-type="writing">Writing</button>
+          <button class="content-tab" type="button" data-type="work">Projects</button>
+        </div>
+        <button id="new-entry-button" class="icon-button" type="button" aria-label="New entry" title="New entry">+</button>
+      </div>
+      <label class="search-field">
+        <span class="sr-only">Search entries</span>
+        <input id="entry-search" type="search" placeholder="Search entries…">
+      </label>
+      <div id="entry-list" class="entry-list" aria-live="polite">
+        <p class="empty-state">Loading content…</p>
+      </div>
+    </aside>
+
+    <main class="editor-main">
+      <section id="welcome-panel" class="welcome-panel">
+        <p class="eyebrow">A publishing environment for thoughtful creators.</p>
+        <h1>Write, preview, and publish without leaving your website.</h1>
+        <p>Select an article, or create a new one. Editorial OS writes ordinary Markdown directly to your GitHub repository.</p>
+      </section>
+
+      <section id="editing-panel" class="editing-panel" hidden>
+        <div class="document-fields">
+          <label class="title-field">
+            <span class="sr-only">Title</span>
+            <textarea id="field-title" rows="1" placeholder="Untitled article"></textarea>
+          </label>
+          <label>
+            <span>Description</span>
+            <textarea id="field-description" rows="2" placeholder="A concise introduction or deck"></textarea>
+          </label>
+          <div class="field-grid">
+            <label><span>Publication date</span><input id="field-date" type="date"></label>
+            <label><span>Topics</span><input id="field-tags" type="text" placeholder="AI · Design · Technology"></label>
+            <label><span>Cover image URL</span><input id="field-cover" type="url" placeholder="assets/images/…"></label>
+            <label><span>Cover alt text</span><input id="field-cover-alt" type="text"></label>
+          </div>
+          <div class="document-options">
+            <label class="check-label"><input id="field-draft" type="checkbox"> Draft</label>
+            <label class="check-label"><input id="field-featured" type="checkbox"> Featured</label>
+            <span id="reading-time" class="reading-time">0 min read</span>
+          </div>
+        </div>
+
+        <div class="workspace-tabs" role="tablist" aria-label="Editor mode">
+          <button class="workspace-tab is-active" type="button" data-mode="write">Write</button>
+          <button class="workspace-tab" type="button" data-mode="preview">Preview</button>
+          <button class="workspace-tab" type="button" data-mode="split">Split</button>
+        </div>
+
+        <div class="format-toolbar" aria-label="Formatting tools">
+          <button type="button" data-format="h2">H2</button>
+          <button type="button" data-format="h3">H3</button>
+          <button type="button" data-format="bold"><strong>B</strong></button>
+          <button type="button" data-format="italic"><em>I</em></button>
+          <button type="button" data-format="link">Link</button>
+          <button type="button" data-format="quote">Quote</button>
+          <button type="button" data-format="list">List</button>
+          <button type="button" data-format="image">Image</button>
+          <button type="button" data-format="code">Code</button>
+        </div>
+
+        <div id="workspace" class="workspace mode-write">
+          <div class="writing-pane">
+            <label class="sr-only" for="markdown-editor">Article body</label>
+            <textarea id="markdown-editor" spellcheck="true" placeholder="Start writing…"></textarea>
+          </div>
+          <div class="preview-pane">
+            <article id="article-preview" class="article-preview"></article>
+          </div>
+        </div>
+
+        <footer class="editor-footer">
+          <div id="validation-message" aria-live="polite">Select an entry to begin.</div>
+          <a id="view-live-link" href="#" target="_blank" rel="noreferrer" hidden>View live article ↗</a>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="connect-dialog">
+    <form method="dialog" class="dialog-content">
+      <button class="dialog-close" value="cancel" aria-label="Close">×</button>
+      <p class="eyebrow">GitHub connection</p>
+      <h2>Connect Editorial OS</h2>
+      <p>Enter a fine-grained GitHub personal access token with <strong>Contents: Read and write</strong> access to <code>julianhasse/personal-web</code>.</p>
+      <label><span>Personal access token</span><input id="github-token" type="password" autocomplete="off" placeholder="github_pat_…"></label>
+      <label class="check-label"><input id="remember-token" type="checkbox"> Keep token for this browser session</label>
+      <p class="security-note">The token is sent only to GitHub’s API. It is never committed to the repository.</p>
+      <div class="dialog-actions">
+        <button class="button button-secondary" value="cancel">Cancel</button>
+        <button id="dialog-connect-button" class="button button-primary" value="default" type="button">Connect</button>
+      </div>
+      <p id="connect-error" class="error-message" aria-live="polite"></p>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/editor.js?v=1"></script>
+</body>
+</html>
