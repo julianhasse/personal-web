@@ -19,7 +19,7 @@ The real story is ownership.
 ![](https://substackcdn.com/image/fetch/$s_!fEz9!,w_1456,c_limit,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F1b65f230-9b55-46a4-8cc4-5d38555aa00a_1536x1024.png)
 
 
-# I didn’t replace Substack.
+## I didn’t replace Substack.
 I replaced the idea that I needed it.
 
 With a lot of help from AI, I rebuilt my entire publishing workflow around technologies that have existed for decades: HTML, CSS, JavaScript, Markdown, and Git.
@@ -33,7 +33,7 @@ Just files.
 
 It turns out that’s incredibly liberating.
 
-# Every article is just a Markdown file
+## Every article is just a Markdown file
 One of the biggest surprises was how simple everything became.
 
 To publish a new article, I create a Markdown file inside a folder:
@@ -54,7 +54,7 @@ My writing is now plain text.
 
 If a better platform appears five years from now, my content is already portable.
 
-# My website became my CMS
+## My website became my CMS
 This is probably my favorite part.
 
 People often assume a Content Management System has to be WordPress, Ghost, or something equally complex.
@@ -71,7 +71,7 @@ The entire “CMS” is a collection of folders that I control.
 
 There’s something wonderfully satisfying about that.
 
-# I own the technology
+## I own the technology
 When you publish on someone else’s platform, you’re renting space.
 You don’t notice until the landlord changes the rules.
 Maybe AI-generated content becomes restricted.
@@ -90,7 +90,7 @@ Git.
 Those aren’t trends.
 They’re infrastructure.
 
-# AI became part of the publishing workflow
+## AI became part of the publishing workflow
 The irony isn’t lost on me.
 
 **I left a platform because of its attitude toward AI...**
@@ -122,7 +122,7 @@ It became a collaborator.
 
 Exactly as I believe these tools should.
 
-# This is only the beginning
+## This is only the beginning
 Ironically, by removing a publishing platform, I’ve gained more possibilities.
 
 Because I own the code, I can add features whenever I want.
@@ -134,7 +134,7 @@ None of those ideas require waiting for a company roadmap.
 
 If I can imagine it, I can build it.
 
-# The lesson wasn’t about Substack
+## The lesson wasn’t about Substack
 Substack was never really the problem.
 
 It simply reminded me of something I already knew.
