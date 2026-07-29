@@ -38,24 +38,6 @@
     return project.external_url || `article.html?type=work&post=${encodeURIComponent(project.slug)}`;
   }
 
-  function projectAccent(project) {
-    if (project.card_accent) return project.card_accent;
-    const terms = [project.type, ...(project.categories || [])].join(' ').toLowerCase();
-    if (terms.includes('health')) return '#7d93ad';
-    if (terms.includes('music') || terms.includes('album')) return '#ad906f';
-    if (terms.includes('ai') || terms.includes('technology')) return '#8b82a8';
-    if (terms.includes('writing') || terms.includes('publication')) return '#858581';
-    return '#8d9690';
-  }
-
-  function projectCategories(project) {
-    const values = [project.type, ...(project.categories || [])]
-      .map((value) => String(value || '').trim())
-      .filter(Boolean);
-    return [...new Set(values.map((value) => value.toUpperCase()))].join(' · ');
-  }
-
-
   async function loadWork() {
     const grid = document.querySelector('#project-grid');
     if (!grid || !window.JH_CONTENT) return;
@@ -68,18 +50,19 @@
       }
       const limit = window.JH_SITE_CONFIG?.projectsPerPage || projects.length;
       grid.innerHTML = projects.slice(0, limit).map((project) => {
-        const href = projectHref(project);
-        const summary = project.card_summary || project.summary || project.description || '';
-        const footerLabel = project.year || project.status || 'View project';
+        const eyebrow = [project.type || 'Project', project.status || project.year].filter(Boolean).join(' · ');
+        const summary = project.summary || project.role || '';
+        const footer = (project.categories.length ? project.categories : [project.role]).filter(Boolean).join(' ✳ ');
+        const accent = project.accent ? ` style="--project-accent:${escapeHtml(project.accent)}"` : '';
         return `
-        <article class="project-card" data-filter="${escapeHtml([project.type, ...(project.categories || [])].join(' '))}" style="--project-accent:${escapeHtml(projectAccent(project))}">
-          <a class="project-card-link" href="${escapeHtml(href)}" aria-label="Open ${escapeHtml(project.title)} project">
-            <p class="project-categories">${escapeHtml(projectCategories(project))}</p>
+        <article class="project-card"${accent} data-filter="${escapeHtml([project.type, ...project.categories].join(' '))}">
+          <a class="project-card-link" href="${escapeHtml(projectHref(project))}" aria-label="Open ${escapeHtml(project.title)} project">
+            <p class="project-categories">${escapeHtml(eyebrow)}</p>
             <div class="project-rule" aria-hidden="true"></div>
             <h3>${escapeHtml(project.title)}</h3>
             ${summary ? `<p class="project-summary">${escapeHtml(summary)}</p>` : ''}
             <div class="project-footer">
-              <span>${escapeHtml(footerLabel)}</span>
+              <span>${escapeHtml(footer || 'View project')}</span>
               <span class="project-arrow" aria-hidden="true">→</span>
             </div>
           </a>

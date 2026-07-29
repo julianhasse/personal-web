@@ -37,7 +37,12 @@
         <div class="article-byline"><span>${escapeHtml(article.author || 'Julian Hasse')}</span><time datetime="${escapeHtml(article.date || '')}">${escapeHtml(formatDate(article.date))}</time><span>${escapeHtml(article.reading)}</span></div>
       </header>
       ${article.cover ? `<figure class="article-cover"><img src="${escapeHtml(article.cover)}" alt="${escapeHtml(article.cover_alt || '')}"></figure>` : ''}
-      <article class="article-body">${marked.parse(article.body)}</article>`;
+      <article class="article-body">${marked.parse(article.body)}</article>
+      <footer class="article-end">
+        <span class="article-end-mark" aria-hidden="true">✳</span>
+        <p>Thanks for reading.</p>
+        <a class="text-link" href="index.html#writing">Explore more writing <span>↗</span></a>
+      </footer>`;
   }
 
   function renderWork(project) {
@@ -71,6 +76,23 @@
       </div>`;
   }
 
+  function initializeReadingProgress() {
+    const bar = document.querySelector('.reading-progress span');
+    const article = document.querySelector('.article-body');
+    if (!bar || !article) return;
+
+    const update = () => {
+      const start = article.offsetTop;
+      const end = start + article.offsetHeight - window.innerHeight;
+      const progress = end <= start ? 1 : Math.min(1, Math.max(0, (window.scrollY - start) / (end - start)));
+      bar.style.transform = `scaleX(${progress})`;
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+  }
+
   try {
     const content = await window.JH_CONTENT.getContent(type, post);
     setNavigation(type);
@@ -78,7 +100,10 @@
     const description = document.querySelector('meta[name="description"]') || document.head.appendChild(document.createElement('meta'));
     description.name = 'description';
     description.content = content.description || content.summary || '';
+    target.classList.toggle('work-page', type === 'work');
+    document.body.classList.toggle('work-reading-mode', type === 'work');
     target.innerHTML = type === 'work' ? renderWork(content) : renderWriting(content);
+    if (type === 'writing') initializeReadingProgress();
   } catch (error) {
     const label = type === 'work' ? 'Project' : 'Article';
     target.innerHTML = `<div class="article-loading"><h1>${label} unavailable</h1><p>${escapeHtml(error.message)}</p><p><a href="index.html#${type === 'work' ? 'work' : 'writing'}">Return to ${type === 'work' ? 'projects' : 'writing'}</a></p></div>`;
