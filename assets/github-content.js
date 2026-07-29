@@ -137,9 +137,24 @@
     return items.filter((item) => item.draft !== true && item.status !== 'draft');
   }
 
+
+  function dateValue(value) {
+    if (!value) return 0;
+    const text = String(value);
+    const parsed = new Date(text.includes('T') ? text : `${text}T12:00:00`);
+    return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+  }
+
+  function resolveAssetUrl(value) {
+    const path = String(value || '').trim();
+    if (!path || /^(?:https?:)?\/\//i.test(path) || path.startsWith('data:')) return path;
+    const base = String(window.JH_SITE_CONFIG?.siteUrl || window.location.origin).replace(/\/$/, '');
+    return `${base}/${path.replace(/^\.?\//, '')}`;
+  }
+
   async function listArticles() {
     const articles = await listContent('writing');
-    return articles.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    return articles.sort((a, b) => dateValue(b.date) - dateValue(a.date) || String(a.title).localeCompare(String(b.title)));
   }
 
   async function listProjects() {
@@ -170,6 +185,7 @@
     getArticle,
     parseMarkdown,
     rawUrl,
-    contentPath
+    contentPath,
+    resolveAssetUrl
   };
 })();

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/editor.css?v=1">
+  <link rel="stylesheet" href="assets/editor.css?v=2">
 </head>
 <body>
   <div class="editor-shell">
@@ -62,10 +62,28 @@
           <div class="field-grid">
             <label><span>Publication date</span><input id="field-date" type="date"></label>
             <label><span>Topics</span><input id="field-tags" type="text" placeholder="AI · Design · Technology"></label>
-            <label><span>Cover image URL</span><input id="field-cover" type="url" placeholder="assets/images/…"></label>
+            <label><span>Cover image path or URL</span><input id="field-cover" type="text" placeholder="assets/articles/…/cover.webp"></label>
             <label><span>Cover alt text</span><input id="field-cover-alt" type="text"></label>
           </div>
+
+          <div id="project-fields" class="project-fields" hidden>
+            <p class="field-section-label">Project details</p>
+            <div class="field-grid">
+              <label><span>Role</span><input id="field-role" type="text"></label>
+              <label><span>Client</span><input id="field-client" type="text"></label>
+              <label><span>Duration</span><input id="field-duration" type="text" placeholder="2026 or 6 weeks"></label>
+              <label><span>Status</span><input id="field-status" type="text" placeholder="Published"></label>
+              <label><span>Project type</span><input id="field-project-type" type="text" placeholder="Publication"></label>
+              <label><span>Display order</span><input id="field-order" type="number" step="1" min="0"></label>
+              <label><span>External URL</span><input id="field-external-url" type="url" placeholder="https://…"></label>
+              <label><span>Year</span><input id="field-year" type="text" placeholder="2026"></label>
+              <label><span>Accent color</span><input id="field-accent" type="text" placeholder="#ffe53f"></label>
+              <label><span>Text color</span><input id="field-text-color" type="text" placeholder="#0a0a08"></label>
+              <label><span>Monogram</span><input id="field-monogram" type="text" placeholder="GIT"></label>
+            </div>
+          </div>
           <div class="document-options">
+            <span id="document-status" class="document-status">New entry</span>
             <label class="check-label"><input id="field-draft" type="checkbox"> Draft</label>
             <label class="check-label"><input id="field-featured" type="checkbox"> Featured</label>
             <span id="reading-time" class="reading-time">0 min read</span>
@@ -102,7 +120,7 @@
 
         <footer class="editor-footer">
           <div id="validation-message" aria-live="polite">Select an entry to begin.</div>
-          <a id="view-live-link" href="#" target="_blank" rel="noreferrer" hidden>View live article ↗</a>
+          <div class="editor-footer-links"><a id="view-history-link" href="#" target="_blank" rel="noreferrer" hidden>Version history ↗</a><a id="view-live-link" href="#" target="_blank" rel="noreferrer" hidden>View live article ↗</a></div>
         </footer>
       </section>
     </main>
@@ -127,6 +145,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="assets/config.js"></script>
-  <script src="assets/editor.js?v=1"></script>
+  <script src="assets/editor.js?v=2"></script>
 </body>
 </html>

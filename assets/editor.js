@@ -14,10 +14,14 @@
     list: $('#entry-list'), search: $('#entry-search'), welcome: $('#welcome-panel'), panel: $('#editing-panel'),
     title: $('#field-title'), description: $('#field-description'), date: $('#field-date'), tags: $('#field-tags'),
     cover: $('#field-cover'), coverAlt: $('#field-cover-alt'), draft: $('#field-draft'), featured: $('#field-featured'),
+    projectFields: $('#project-fields'), role: $('#field-role'), client: $('#field-client'), duration: $('#field-duration'),
+    status: $('#field-status'), projectType: $('#field-project-type'), order: $('#field-order'), externalUrl: $('#field-external-url'),
+    year: $('#field-year'), accent: $('#field-accent'), textColor: $('#field-text-color'), monogram: $('#field-monogram'),
     body: $('#markdown-editor'), preview: $('#article-preview'), reading: $('#reading-time'), validation: $('#validation-message'),
     live: $('#view-live-link'), connect: $('#connect-button'), dialog: $('#connect-dialog'), token: $('#github-token'),
     remember: $('#remember-token'), connectSubmit: $('#dialog-connect-button'), connectError: $('#connect-error'),
-    saveDraft: $('#save-draft-button'), publish: $('#publish-button'), saveStatus: $('#save-status'), workspace: $('#workspace')
+    saveDraft: $('#save-draft-button'), publish: $('#publish-button'), saveStatus: $('#save-status'), workspace: $('#workspace'),
+    documentStatus: $('#document-status'), history: $('#view-history-link')
   };
 
   const apiBase = `https://api.github.com/repos/${config.owner}/${config.repo}`;
@@ -53,8 +57,30 @@
     return d.toISOString().slice(0, 10);
   }
   function displayDate(value) {
-    const d = new Date(value || 0);
+    if (!value) return '';
+    const text = String(value);
+    const d = new Date(text.includes('T') ? text : `${text}T12:00:00`);
     return Number.isNaN(d.getTime()) ? '' : new Intl.DateTimeFormat('en-US', {month:'short', day:'numeric', year:'numeric'}).format(d);
+  }
+  function localIsoForDate(dateOnly, useCurrentTime = false) {
+    const now = new Date();
+    const [year, month, day] = String(dateOnly).split('-').map(Number);
+    const date = new Date(year, month - 1, day, useCurrentTime ? now.getHours() : 12, useCurrentTime ? now.getMinutes() : 0, useCurrentTime ? now.getSeconds() : 0);
+    const offsetMinutes = -date.getTimezoneOffset();
+    const sign = offsetMinutes >= 0 ? '+' : '-';
+    const pad = value => String(Math.abs(value)).padStart(2, '0');
+    return `${dateOnly}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${sign}${pad(Math.trunc(offsetMinutes / 60))}:${pad(offsetMinutes % 60)}`;
+  }
+  function publicationDate(originalValue, dateOnly, isNew) {
+    if (originalValue && String(originalValue).slice(0, 10) === dateOnly && String(originalValue).includes('T')) return originalValue;
+    const today = new Date().toLocaleDateString('en-CA');
+    return localIsoForDate(dateOnly, Boolean(isNew && dateOnly === today));
+  }
+  function resolveAssetUrl(value) {
+    const path = String(value || '').trim();
+    if (!path || /^(?:https?:)?\/\//i.test(path) || path.startsWith('data:') || path.startsWith('blob:')) return path;
+    const base = String(window.JH_SITE_CONFIG?.siteUrl || window.location.origin).replace(/\/$/, '');
+    return `${base}/${path.replace(/^\.?\//, '')}`;
   }
   function parseScalar(value) {
     const v = value.trim();
@@ -75,8 +101,8 @@
   }
   function yamlString(value) { return `"${String(value ?? '').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,' ')}"`; }
   function serializeDocument(data, body) {
-    const preferred = ['title','date','tags','description','reading','author','cover','cover_alt','draft','featured'];
-    if (state.type === 'work') preferred.push('summary','categories','role','client','duration','year','status','external_url');
+    const preferred = ['title','date','updated_at','tags','description','reading','author','cover','cover_alt','draft','featured'];
+    if (state.type === 'work') preferred.push('summary','categories','role','client','duration','year','status','external_url','type','order','accent','text_color','monogram');
     const lines = [];
     const seen = new Set();
     preferred.forEach(key => {
@@ -158,7 +184,20 @@
     els.coverAlt.value = data.cover_alt || '';
     els.draft.checked = Boolean(data.draft);
     els.featured.checked = Boolean(data.featured);
+    els.projectFields.hidden = state.type !== 'work';
+    els.role.value = data.role || '';
+    els.client.value = data.client || '';
+    els.duration.value = data.duration || '';
+    els.status.value = data.status || '';
+    els.projectType.value = data.type || data.project_type || '';
+    els.order.value = data.order ?? '';
+    els.externalUrl.value = data.external_url || '';
+    els.year.value = data.year || '';
+    els.accent.value = data.accent || '';
+    els.textColor.value = data.text_color || '';
+    els.monogram.value = data.monogram || '';
     els.body.value = body || '';
+    updateDocumentStatus();
     autoGrowTitle();
     state.dirty = false;
     updateStatus(); updatePreview(); updateButtons();
@@ -171,7 +210,8 @@
     const data = {
       ...original,
       title: els.title.value.trim(),
-      date: els.date.value,
+      date: publicationDate(original.date, els.date.value, Boolean(state.current?.isNew)),
+      updated_at: new Date().toISOString(),
       tags: els.tags.value.trim(),
       description: els.description.value.trim(),
       reading: `${getReadingTime()} min read`,
@@ -184,6 +224,17 @@
     if (state.type === 'work') {
       data.summary = data.description;
       data.categories = data.tags;
+      data.role = els.role.value.trim();
+      data.client = els.client.value.trim();
+      data.duration = els.duration.value.trim();
+      data.status = els.status.value.trim();
+      data.type = els.projectType.value.trim();
+      data.order = els.order.value === '' ? '' : Number(els.order.value);
+      data.external_url = els.externalUrl.value.trim();
+      data.year = els.year.value.trim();
+      data.accent = els.accent.value.trim();
+      data.text_color = els.textColor.value.trim();
+      data.monogram = els.monogram.value.trim();
     }
     return data;
   }
@@ -195,11 +246,20 @@
     if (els.cover.value.trim() && !els.coverAlt.value.trim()) issues.push('Add alt text for the cover image');
     return issues;
   }
+  function updateDocumentStatus() {
+    if (!state.current) return;
+    const published = !els.draft.checked && !state.current.isNew;
+    els.documentStatus.textContent = state.current.isNew ? 'New entry' : (published ? 'Published' : 'Draft');
+    els.documentStatus.classList.toggle('is-published', published);
+    els.publish.textContent = state.current.isNew ? 'Publish' : (published ? 'Update article' : 'Publish');
+    els.saveDraft.textContent = state.current.isNew ? 'Save draft' : 'Save changes';
+  }
   function updateButtons() {
     const connected = Boolean(state.token);
     els.saveDraft.disabled = !connected || !state.current;
     els.publish.disabled = !connected || !state.current;
     els.connect.textContent = connected ? 'GitHub connected' : 'Connect GitHub';
+    updateDocumentStatus();
   }
   function updateStatus(message) {
     els.saveStatus.textContent = message || (state.token ? (state.dirty ? 'Unsaved changes' : 'All changes saved') : 'Not connected');
@@ -212,7 +272,7 @@
     const deck = escapeHtml(els.description.value.trim());
     const date = escapeHtml(displayDate(els.date.value));
     const tags = escapeHtml(els.tags.value.trim());
-    const cover = els.cover.value.trim();
+    const cover = resolveAssetUrl(els.cover.value.trim());
     const coverAlt = escapeHtml(els.coverAlt.value.trim());
     const html = window.marked ? marked.parse(els.body.value || '') : `<pre>${escapeHtml(els.body.value)}</pre>`;
     els.preview.innerHTML = `<header><p class="eyebrow">${tags || (state.type === 'work' ? 'Project' : 'Writing')}</p><h1>${title}</h1>${deck ? `<p class="preview-deck">${deck}</p>`:''}<p class="preview-meta">Julian Hasse · ${date} · ${getReadingTime()} min read</p></header>${cover ? `<img src="${escapeHtml(cover)}" alt="${coverAlt}">` : ''}${html}`;
@@ -222,6 +282,12 @@
     const slug = state.current?.path ? state.current.path.split('/').pop().replace(/\.md$/,'') : slugify(els.title.value);
     els.live.href = `article.html?${state.type === 'work' ? 'type=work&' : ''}post=${encodeURIComponent(slug)}`;
     els.live.hidden = Boolean(state.current?.isNew);
+    if (state.current?.path) {
+      els.history.href = `https://github.com/${config.owner}/${config.repo}/commits/${config.branch}/${state.current.path}`;
+      els.history.hidden = false;
+    } else {
+      els.history.hidden = true;
+    }
   }
 
   async function save(forceDraft) {
@@ -244,6 +310,7 @@
       state.dirty = false;
       updateStatus(forceDraft ? 'Draft saved' : 'Published');
       await loadEntries();
+      updateDocumentStatus();
       updatePreview();
       setTimeout(() => updateStatus(), 1800);
     } catch (error) {
@@ -289,7 +356,7 @@
     els.workspace.className=`workspace mode-${state.mode}`; updatePreview();
   }));
   document.querySelectorAll('[data-format]').forEach(button => button.addEventListener('click', () => formatSelection(button.dataset.format)));
-  [els.title,els.description,els.date,els.tags,els.cover,els.coverAlt,els.draft,els.featured,els.body].forEach(input => input.addEventListener('input', () => { if (input===els.title) autoGrowTitle(); markDirty(); }));
+  [els.title,els.description,els.date,els.tags,els.cover,els.coverAlt,els.draft,els.featured,els.body,els.role,els.client,els.duration,els.status,els.projectType,els.order,els.externalUrl,els.year,els.accent,els.textColor,els.monogram].forEach(input => input.addEventListener('input', () => { if (input===els.title) autoGrowTitle(); markDirty(); }));
   els.search.addEventListener('input', filterEntries);
   $('#new-entry-button').addEventListener('click', newEntry);
   els.connect.addEventListener('click', openConnect);

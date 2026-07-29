@@ -1135,7 +1135,7 @@ button {
 /* Editorial project detail layout */
 .work-layout {
   display: grid;
-  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(340px, 400px) minmax(0, 1fr);
   column-gap: clamp(3rem, 5vw, 5rem);
   align-items: start;
 }
@@ -1156,12 +1156,13 @@ button {
   width: 100%;
   max-width: 100%;
   margin: 1.15rem 0 1.5rem;
-  font-size: clamp(3rem, 4.6vw, 4.75rem);
+  font-size: clamp(3rem, 4.15vw, 4.35rem);
   line-height: 0.98;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.045em;
   text-wrap: balance;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
   word-break: normal;
+  hyphens: none;
 }
 
 .work-header .article-deck {
@@ -1534,7 +1535,7 @@ button {
 
 /* Preserve the project case-study split introduced before Editorial OS. */
 .work-layout {
-  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(340px, 400px) minmax(0, 1fr);
 }
 
 .work-main,

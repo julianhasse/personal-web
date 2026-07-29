@@ -10,7 +10,8 @@
   })[char]);
   const formatDate = (value) => {
     if (!value) return '';
-    const date = new Date(`${value}T12:00:00`);
+    const text = String(value);
+    const date = new Date(text.includes('T') ? text : `${text}T12:00:00`);
     return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(date);
   };
 
@@ -36,7 +37,7 @@
         ${deck ? `<p class="article-deck">${escapeHtml(deck)}</p>` : ''}
         <div class="article-byline"><span>${escapeHtml(article.author || 'Julian Hasse')}</span><time datetime="${escapeHtml(article.date || '')}">${escapeHtml(formatDate(article.date))}</time><span>${escapeHtml(article.reading)}</span></div>
       </header>
-      ${article.cover ? `<figure class="article-cover"><img src="${escapeHtml(article.cover)}" alt="${escapeHtml(article.cover_alt || '')}"></figure>` : ''}
+      ${article.cover ? `<figure class="article-cover"><img src="${escapeHtml(window.JH_CONTENT.resolveAssetUrl(article.cover))}" alt="${escapeHtml(article.cover_alt || '')}"></figure>` : ''}
       <article class="article-body">${marked.parse(article.body)}</article>
       <footer class="article-end">
         <span class="article-end-mark" aria-hidden="true">✳</span>
@@ -54,7 +55,7 @@
       ['Status', project.status]
     ].filter(([, value]) => displayText(value));
     const categories = project.categories.length ? project.categories : [project.type || 'Project'];
-    const hero = displayText(project.cover);
+    const hero = window.JH_CONTENT.resolveAssetUrl(displayText(project.cover));
     const heroAlt = displayText(project.cover_alt) || project.title;
 
     return `

@@ -112,3 +112,13 @@ dialog::backdrop { background: rgba(17,17,15,.55); }
   .mode-split { grid-template-columns: 1fr; }
   .mode-split .writing-pane { border-right: 0; border-bottom: 1px solid var(--line); }
 }
+
+
+/* Editorial OS v1.1 */
+.project-fields { margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
+.field-section-label { margin: 0 0 12px; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.document-status { margin-right: auto; padding: 5px 9px; border: 1px solid var(--line); border-radius: 999px; font: 10px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.document-status.is-published { border-color: color-mix(in srgb, var(--ink) 35%, var(--line)); color: var(--ink); }
+.editor-footer-links { display: flex; gap: 18px; flex-wrap: wrap; }
+.article-preview img { display: block; max-width: 100%; margin: 2rem auto; }
+.article-preview .image-error { padding: 1rem; border: 1px dashed var(--line); color: var(--muted); font: 12px var(--mono); }

@@ -3,6 +3,7 @@
  * After this is set, publish by adding .md files to the configured folder.
  */
 window.JH_SITE_CONFIG = {
+  siteUrl: 'https://www.julianhasse.com',
   github: {
     owner: 'julianhasse',
     repo: 'personal-web',
