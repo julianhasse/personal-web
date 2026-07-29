@@ -7,8 +7,6 @@ duration: 2024–Present
 status: Healthcare
 ---
 
-# Diagnostic Assistant
-
 Diagnostic Assistant supports healthcare providers as they find, select, order, and track laboratory tests within complex clinical environments.
 
 ## Context
