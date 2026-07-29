@@ -16,12 +16,16 @@
     return `https://api.github.com/repos/${encodeURIComponent(github.owner)}/${encodeURIComponent(github.repo)}/contents/${encodedPath}?ref=${encodeURIComponent(github.branch)}`;
   }
 
-  function rawUrl(path) {
-    return `https://raw.githubusercontent.com/${encodeURIComponent(github.owner)}/${encodeURIComponent(github.repo)}/${encodeURIComponent(github.branch)}/${path.split('/').map(encodeURIComponent).join('/')}`;
+  function rawUrl(path, fresh = false) {
+    const base = `https://raw.githubusercontent.com/${encodeURIComponent(github.owner)}/${encodeURIComponent(github.repo)}/${encodeURIComponent(github.branch)}/${path.split('/').map(encodeURIComponent).join('/')}`;
+    return fresh ? `${base}?v=${Date.now()}` : base;
   }
 
   async function request(url) {
-    const response = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
+    const response = await fetch(url, {
+      cache: 'no-store',
+      headers: { Accept: 'application/vnd.github+json' }
+    });
     if (!response.ok) {
       const message = response.status === 403
         ? 'GitHub API rate limit reached. Try again later.'
@@ -151,7 +155,7 @@
     const safeSlug = String(slug || '').replace(/[^a-z0-9-_]/gi, '');
     if (!safeSlug) throw new Error('Invalid content name.');
     const path = `${contentPath(safeType).replace(/\/$/, '')}/${safeSlug}.md`;
-    const response = await request(rawUrl(path));
+    const response = await request(rawUrl(path, true));
     return parseMarkdown(await response.text(), safeSlug, safeType);
   }
 
