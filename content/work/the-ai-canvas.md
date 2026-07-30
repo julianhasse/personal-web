@@ -15,7 +15,7 @@ cover_alt: The AI Canvas publication and podcast
 ---
 
 
-# The AI Canvas
+## The AI Canvas
 
 The AI Canvas explores practical, cultural, and professional questions at the intersection of artificial intelligence and design.
 

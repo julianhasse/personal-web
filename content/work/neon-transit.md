@@ -20,7 +20,7 @@ monogram: "NT"
 external_url: ""
 ---
 
-# Neon Transit
+## Neon Transit
 
 Neon Transit is an original album project connecting music composition with a complete visual and editorial identity.
 
