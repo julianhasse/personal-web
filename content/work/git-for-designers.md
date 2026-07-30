@@ -20,7 +20,7 @@ text_color: "#0a0a08"
 monogram: "GIT"
 ---
 
-# Git for Designers
+## Git for Designers
 
 A practical guide that explains Git through the concerns and working habits of designers who have never used version control before.
 
